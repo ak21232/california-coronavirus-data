@@ -5,12 +5,12 @@ Coronavirus analysis
 @author: ak212
 """
 import pandas as pd
-import numpy as np
-from datetime import datetime,timedelta
-from sklearn.metrics import mean_squared_error
-from scipy.optimize import curve_fit
-from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
+from statistics import mean
+import numpy as np
+import datetime as dt
+import math 
 
 
 # csv directories
@@ -20,32 +20,30 @@ state_totals= "latimes-state-totals.csv"
 df = pd.read_csv(state_totals, header = 0)
 df = df.dropna()
 df['date'] = pd.to_datetime(df['date'])
+df['confirmed_cases'] = np.log(df['confirmed_cases'])
+print(df.index)
+x = df['date'].map(dt.datetime.toordinal)
+y = df['confirmed_cases']
 
-def growth_funct(x,a,b,c):
-    return (c/(1+np.exp(-(x-b)/a)))
 
-x = list(df.index)
-y = list(df.confirmed_cases)
+def logFit(x,y):
+    # cache some frequently reused terms
+    sumy = np.sum(y)
+    sumlogx = np.sum(np.log(x))
 
-fit = curve_fit(growth_funct,x,y)
+    b = (x.size*np.sum(y*np.log(x)) - sumy*sumlogx)/(x.size*np.sum(np.log(x)**2) - sumlogx**2)
+    a = (sumy - b*sumlogx)/x.size
 
-a = 11.2
-b = 87.9
-c = 79216.8
+    return a,b
 
-sol = int(fsolve(lambda x: growth_funct(x,a,b,c) - int(c),b))
+def logFunc(x, a, b):
+    return a + b*np.log(x)
 
-pred_x = list(range(max(x),sol))
 
-plt.scatter(x,y,label="Real data",color="red")
-
-plt.plot(x+pred_x, [growth_funct(i,fit[0][0],fit[0][1],fit[0][2]) for i in x+pred_x], label="Logistic model" )
-
-plt.title("California COVID-19 Predictions")
-plt.ylabel("Number of Infections")
-plt.xlabel("Days Since Jan 1 2020")
-plt.grid(True)
-plt.legend(loc="upper left")
+plt.plot(df['date'], y, ls="none", marker='.')
+xfit = np.linspace(737451,737580,num=200, endpoint = True)
+plt.plot(xfit, logFunc(xfit, *logFit(x,y)))
+plt.ylabel("Average Increase in Cases")
+plt.xlabel("Time")
+plt.title("Average Increase of COVID-19 Cases Over Time")
 plt.show()
-
-print(growth_funct(180,a,b,c))
