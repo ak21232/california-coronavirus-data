@@ -26,21 +26,30 @@ def growth_funct(x,a,b,c):
 
 x = list(df.index)
 y = list(df.confirmed_cases)
+y_1 = list(df.deaths)
 
-fit = curve_fit(growth_funct,x,y)
+growth_fit = curve_fit(growth_funct,x,y)
+death_fit = curve_fit(growth_funct,x,y_1)
+print (growth_fit)
 
 a = 8.925
 b = 80.3
 c = 56598.7
 
-sol = int(fsolve(lambda x: growth_funct(x,a,b,c) - int(c),b))
+a_death = 12.3
+b_death = 91.6
+c_death = 91137.5
 
-pred_x = list(range(max(x),sol))
+sol_growth = int(fsolve(lambda x: growth_funct(x,a,b,c) - int(c),b))
+sol_death = int(fsolve(lambda x: growth_funct(x,a_death,b_death,c_death) - int(c_death),b_death))
 
-plt.scatter(x,y,label="Real data",color="red")
+growth_pred_x = list(range(max(x),sol_growth))
+death_pred_x = list(range(max(x),sol_death))
 
-plt.plot(x+pred_x, [growth_funct(i,fit[0][0],fit[0][1],fit[0][2]) for i in x+pred_x], label="Logistic model" )
-
+plt.scatter(x,y,label="Observed Infections",color="red")
+plt.scatter(x,y_1,label="Observed Deaths",color="black")
+plt.plot(x+growth_pred_x, [growth_funct(i,growth_fit[0][0],growth_fit[0][1],growth_fit[0][2]) for i in x+growth_pred_x], label="Infections model" )
+plt.plot(x+death_pred_x, [growth_funct(i,death_fit[0][0],death_fit[0][1],death_fit[0][2]) for i in x+death_pred_x], label="Deaths model" )
 plt.title("California COVID-19 Predictions")
 plt.ylabel("Number of Infections")
 plt.xlabel("Days Since Jan 1 2020")
@@ -48,4 +57,4 @@ plt.grid(True)
 plt.legend(loc="upper left")
 plt.show()
 
-print(growth_funct(180,a,b,c))
+print(growth_funct(250,a,b,c))
