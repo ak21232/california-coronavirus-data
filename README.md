@@ -13,14 +13,24 @@ The Los Angeles Times' independent tally of coronavirus cases in California.
 - [latimes-agency-websites.csv](#latimes-agency-websitescsv)
 - [latimes-place-totals.csv](#latimes-place-totalscsv)
 - [cdph-state-totals.csv](#cdph-state-totalscsv)
+- [cdph-positive-test-rate.csv](#cdph-positive-test-ratecsv)
+- [cdph-age.csv](#cdph-agecsv)
+- [cdph-race-ethnicity.csv](#cdph-race-ethnicitycsv)
 - [cdph-skilled-nursing-totals.csv](#cdph-skilled-nursing-totalscsv)
 - [cdph-adult-and-senior-care-totals.csv](#cdph-skilled-nursing-totalscsv)
 - [cdph-skilled-nursing-facilities.csv](#cdph-skilled-nursing-facilitiescsv)
 - [cdph-adult-and-senior-care-facilities.csv](#cdph-adult-and-senior-care-facilitiescsv)
+- [cdph-nursing-home-county-totals.csv](#cdph-nursing-home-county-totalscsv)
 - [cdph-hospital-patient-county-totals.csv](#cdph-hospital-patient-county-totalscsv)
+- [cdph-reopening-tiers.csv](#cdph-reopening-tierscsv)
+- [cdph-reopening-metrics.csv](#cdph-reopening-metricscsv)
+- [cdph-regional-stay-home-metrics.csv](#cdph-regional-stay-home-metricscsv)
+- [cdcr-state-totals.csv](#cdcr-state-totalscsv)
+- [cdcr-prison-totals.csv](#cdcr-prison-totalscsv)
 - [latimes-project-roomkey-totals.csv](#latimes-project-roomkey-totalscsv)
 - [latimes-beach-closures-county-list.csv](#latimes-beach-closures-county-listcsv)
 - [latimes-beach-closures-area-list.csv](#latimes-beach-closures-area-listcsv)
+- [los-angeles-countywide-statistical-areas.json](#los-angeles-countywide-statistical-areasjson)
 
 ## About the data
 
@@ -49,6 +59,10 @@ To inquire about reuse, please contact Data and Graphics Editor Ben Welsh at [be
 - [Capradio: "Track COVID-19 Cases In California By County"](https://www.capradio.org/articles/2020/03/31/track-covid-19-cases-in-california-by-county/)
 - [Race Counts: "How race, class and place fuel a pandemic"](https://www.racecounts.org/covid/)
 - [covid-19-datasette](https://covid-19.datasettes.com/covid)
+- [KQED: "How Many Coronavirus Cases Are in California? See Latest Numbers by County"](https://www.kqed.org/news/11809760/how-many-california-coronavirus-cases-see-latest-numbers-by-county)
+- [KQED: "Here Are the Trendlines for COVID-19 Deaths and Hospitalizations in Each Bay Area County"](https://www.kqed.org/science/1964968/charts-the-bay-area-is-opening-up-again-heres-tracking-data-for-each-county-to-see-how-its-going)
+- [Geography Planet: Southern California COVID trend map](https://geographyplanet.org/map-gallery/southern-california-covid-19-trend-map/)
+- [weylunlee.github.io/covidtrack](https://weylunlee.github.io/covidtrack/)
 
 ## Data dictionary
 
@@ -66,6 +80,7 @@ Most counties have only one agency except for Alameda and Los Angeles counties, 
 | `date`            | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                                                                                                 |
 | `confirmed_cases` | integer | The cumulative number of confirmed coronavirus cases as of this `date`.                                                                                                                                                             |
 | `deaths`          | integer | The cumulative number of deaths attributed to coronavirus as of this `date`.                                                                                                                                                        |
+| `recoveries`      | integer | The cumulative number of recovered cases as of this `date`. Only some agencies provide this data.                                                                                                                                   |
 | `did_not_update`  | boolean | Indicates if the agency did not provide an update on this date. If this is `true` and the case and death totals are unchanged from the previous day, this means they were holdovers. Use this flag omit these records when desired. |
 
 ### [latimes-county-totals.csv](./latimes-county-totals.csv)
@@ -102,18 +117,20 @@ It comes with all of the same caveats as its source. It is included here as a co
 
 The 61 local-health agency websites that the Los Angeles Times consults to conduct its survey.
 
-| field    | type   | description                                                 |
-| -------- | ------ | ----------------------------------------------------------- |
-| `agency` | string | The name of the county or city public health agency.        |
-| `url`    | string | The location of the agency's website on the World Wide Web. |
+| field    | type   | description                                                                                                                                                                                    |
+| -------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `county` | string | The name of the county where the city is located.                                                                                                                                              |
+| `fips`   | string | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources.           |
+| `agency` | string | The name of the county or city public health agency.                                                                                                                                           |
+| `url`    | string | The location of the agency's website on the World Wide Web.                                                                                                                                    |
 
 ### [latimes-place-totals.csv](./latimes-place-totals.csv)
 
-Some counties, primarily in Southern California, break out the location of cases within their service area. The Times is gathering and consolidating these lists. Each row contains cumulative case totals reported in that area as of that date.
+Most counties break out the location of cases within their service area. The Times is gathering and consolidating these lists. Each row contains cumulative case totals reported in that area as of that date.
 
-The following counties currently do not report cases by locality: Alpine, Colusa, Del Norte, Glenn, Inyo, Lake, Lassen, Madera, Mariposa, Modoc, San Benito, San Mateo, Shasta, Sierra, Siskiyou, Sutter, Tehama, Trinity, Tuolumne and Yuba
+The following counties currently do not report cases by locality: Alpine, Colusa, Glenn, Lassen, Mariposa, Modoc, San Benito, Sierra, Tehama and Tuolumne.
 
-Some counties provide data by region. The locations provided by Los Angeles County correspond to the public health department's official "Countywide Statistical Areas". Locations in other counties are manually geocoded by The Times. San Francisco and Imperial counties provide data at the ZIP Code level.
+Different counties provide different geography types. Some provide data by region, some by Census designation, some by ZIP Code. The locations provided by Los Angeles County correspond to the public health department's official "Countywide Statistical Areas". Locations in many counties are manually geocoded by The Times.
 
 Be aware that some counties have shifted the place names used over time.
 
@@ -129,6 +146,7 @@ In some circumstances the true total of cases is obscured. Los Angeles and Orang
 | `note`            | string  | In cases where the `confirmed_cases` are obscured, this explains the range of possible values.                                                                                       |
 | `x`               | float   | The longitude of the `place`.                                                                                                                                                        |
 | `y`               | float   | The latitude of the `place`.                                                                                                                                                         |
+| `population`      | integer | The number of residents in the area. Not available for all places.                                                                                                                   |                                  
 
 ### [cdph-state-totals.csv](./cdph-state-totals.csv)
 
@@ -171,6 +189,51 @@ Some dates are missing because the state did not publish a press release for tha
 | `healthcare_worker_deaths`     | integer | The total number of healthcare workers who have died from COVID-19.                                                                                                                                          |
 | `source_url`                   | string  | The URL to the state press release.                                                                                                                                                                          |
 
+### [cdph-positive-test-rate.csv](./cdph-positive-test-rate.csv)
+
+All of the data used by The Times to estimate how many recent tests have come back positive. The daily tallies of new cases and tests are drawn from [cdph-state-totals.csv](./cdph-state-totals.csv).
+
+| field                                  | type    | description                                                                                                                                            |
+| -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`                                 | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                    |
+| `confirmed_cases`                      | integer | The cumulative number of confirmed coronavirus case at that time.                                                                                      |
+| `total_tests`                          | integer | The total number of tests conducted.                                                                                                                   |
+| `new_confirmed_cases`                  | integer | The number of new confirmed cases compared to the previous date.                                                                                       |
+| `new_tests`                            | integer | The number of new tests compared to the previous date.                                                                                                 |
+| `new_confirmed_cases_seven_day_total`  | integer | The total number of new confirmed cases in the previous seven days.                                                                                    |
+| `new_tests_seven_day_total`            | integer | The total number of new tests in the previous seven days.                                                                                              |
+| `positive_test_rate_seven_day_percent` | float   | The positive test rate over the past seven days, calculated by dividing the number of new confirmed cases over that time into the number of new tests. |
+
+### [cdph-age.csv](./cdph-age.csv)
+
+Statewide demographic data tallying totals by age for both cases and deaths. Provided by the [California Department of Public Health](https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/COVID-19/COVID-19-Cases-by-Age-Group.aspx).
+
+| field                     | type    | description                                                                                         |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `date`                    | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format. |
+| `age`                     | string  | The age bracket being tallied                                                                       |
+| `confirmed_cases_total`   | integer | The cumulative number of confirmed coronavirus case amoung this age bracket at that time.           |
+| `confirmed_cases_percent` | float   | The case totals percentage of the total in this age bracket                                         |
+| `deaths_total`            | integer | The cumulative number of deaths case amoung this age bracket at that time.                          |
+| `deaths_percent`          | float   | The death totals percentage of the total in this age bracket.                                       |
+
+### [cdph-race-ethnicity.csv](./cdph-race-ethnicity.csv)
+
+Statewide demographic data tallying race totals by age for both cases and deaths. Provided by the [California Department of Public Health](https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/COVID-19/Race-Ethnicity.aspx).
+
+The original race categories published by the state have been grouped and aggregated to match the five race categories traditionally published by the Los Angeles Times.
+
+| field                     | type    | description                                                                                         |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `date`                    | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format. |
+| `race`                    | string  | The race being tallied.                                                                             |
+| `age`                     | string  | The age bracket being tallied                                                                       |
+| `confirmed_cases_total`   | integer | The cumulative number of confirmed coronavirus case amoung this race and age at that time.          |
+| `confirmed_cases_percent` | float   | The case totals percentage of the total in this age bracket                                         |
+| `deaths_total`            | integer | The cumulative number of deaths case amoung this race and age at that time.                         |
+| `deaths_percent`          | float   | The death totals percentage of the total in this age bracket.                                       |
+| `population_percent`      | float   | The race's percentage of the overall state population in this age bracket.                          |
+
 ### [cdph-skilled-nursing-totals.csv](./cdph-skilled-nursing-totals.csv)
 
 California's Department of Public Health is releasing totals tracking the cumulative number of cases and deaths at the state's skilled nursing facilities.
@@ -180,19 +243,18 @@ In some circumstances the true total of cases is obscured. The lowest number in 
 | field                           | type    | description                                                                                             |
 | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
 | `date`                          | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.     |
-| `staff_confirmed_cases`         | integer | The cumulative number of confirmed coronavirus case amoung staff at that time.                          |
-| `patients_confirmed_cases`      | integer | The cumulative number of confirmed coronavirus case amoung patients at that time.                       |
-| `staff_confirmed_cases_note`    | string  | In cases where the `staff_confirmed_cases` are obscured, this explains the range of possible values.    |
-| `patients_confirmed_cases_note` | string  | In cases where the `patients_confirmed_cases` are obscured, this explains the range of possible values. |
-| `staff_deaths`                  | integer | The cumulative number of deaths case amoung staff at that time.                                         |
-| `patients_deaths`               | integer | The cumulative number of deaths case amoung patients at that time.                                      |
+| `staff_active_cases`            | integer | The number of active coronavirus case among staff at that time.                                         |
+| `patients_active_cases`         | integer | The number of active coronavirus case amoung patients at that time.                                     |
+| `staff_confirmed_cases`         | integer | The cumulative number of confirmed coronavirus case among staff at that time.                           |
+| `patients_confirmed_cases`      | integer | The cumulative number of confirmed coronavirus case among patients at that time.                        |
+| `staff_deaths`                  | integer | The cumulative number of deaths case among staff at that time.                                          |
+| `patients_deaths`               | integer | The cumulative number of deaths case among patients at that time.                                       |
 | `staff_deaths_note`             | string  | In cases where the `staff_deaths` are obscured, this explains the range of possible values.             |
-| `patients_deaths_note`          | string  | In cases where the `patients_deaths` are obscured, this explains the range of possible values.          |
 | `source_url`                    | string  | The URL to the state data release.                                                                      |
 
 ### [cdph-adult-and-senior-care-totals.csv](./cdph-adult-and-senior-care-totals.csv)
 
-California's Department of Public Health is releasing totals tracking the cumulative number of cases and deaths at the state's residential care facilities for the elderly and adult residential facilities.
+California's Department of Social Services is releasing totals tracking the cumulative number of cases and deaths at the state's residential care facilities for the elderly and adult residential facilities. The source documents are available in the [pdf/adult-and-senior-care/](pdf/adult-and-senior-care/) directory of this repository.
 
 These are also sometimes known as assisted-living facilities. Counts for staff and patients are combined in this dataset into a single total.
 
@@ -201,18 +263,20 @@ These are also sometimes known as assisted-living facilities. Counts for staff a
 | `date`            | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format. |
 | `confirmed_cases` | integer | The cumulative number of confirmed coronavirus case amoung staff and patients at that time.         |
 | `deaths`          | integer | The cumulative number of deaths case amoung staff and patients at that time.                        |
+| `active_cases`    | integer | The number of active coronavirus case at that time.                                                 |
 | `source_url`      | string  | The URL to the state data release.                                                                  |
 
 ### [cdph-skilled-nursing-facilities.csv](./cdph-skilled-nursing-facilities.csv)
 
-California's Department of Public Health is [listing the skilled-nursing facilities](https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/COVID-19/SNFsCOVID_19.aspx) across the state with COVID-19 outbreaks.
+California's Department of Social Services is [listing the skilled-nursing facilities](https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/COVID-19/SNFsCOVID_19.aspx) across the state with COVID-19 outbreaks. The source documents are available in the [pdf/adult-and-senior-care/](pdf/adult-and-senior-care/) directory of this repository.
 
 In some circumstances the true total of cases is obscured. The lowest number in the range is entered into the record in the staff or patients field and an accompanying `note` field includes the set of possible values.
 
 | field                           | type    | description                                                                                                                                                                          |
 | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `date`                          | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                                                  |
-| `name`                          | string  | The name of the nursing home.                                                                                                                                                        |
+| `id`                            | string  | The facility's unique identifier with the state.                                                                                                                                     |
+| `name`                          | string  | The name of the skilled-nursing facility.                                                                                                                                            |
 | `county`                        | string  | The name of the county where the city is located.                                                                                                                                    |
 | `fips`                          | string  | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources. |
 | `staff_confirmed_cases`         | integer | The current number of confirmed coronavirus case amoung staff at that time.                                                                                                          |
@@ -236,14 +300,30 @@ These are also sometimes known as assisted-living facilities. In some circumstan
 | `name`                          | string  | The name of the nursing home.                                                                                                                                                        |
 | `county`                        | string  | The name of the county where the city is located.                                                                                                                                    |
 | `fips`                          | string  | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources. |
-| `staff_confirmed_cases`         | integer | The current number of confirmed coronavirus case amoung staff at that time.                                                                                                          |
-| `patients_confirmed_cases`      | integer | The current number of confirmed coronavirus case amoung patients at that time.                                                                                                       |
+| `staff_confirmed_cases`         | integer | The cumulative number of confirmed coronavirus case amoung staff at that time.                                                                                                       |
+| `patients_confirmed_cases`      | integer | The cumulative number of confirmed coronavirus case amoung patients at that time.                                                                                                    |
 | `staff_confirmed_cases_note`    | string  | In cases where the `staff_confirmed_cases` are obscured, this explains the range of possible values.                                                                                 |
 | `patients_confirmed_cases_note` | string  | In cases where the `patients_confirmed_cases` are obscured, this explains the range of possible values.                                                                              |
-| `staff_deaths`                  | integer | The cumulative number of deaths case amoung staff at that time.                                                                                                                      |
-| `patients_deaths`               | integer | The cumulative number of deaths case amoung patients at that time.                                                                                                                   |
+| `staff_deaths`                  | integer | The cumulative number of deaths amoung staff at that time.                                                                                                                      |
+| `patients_deaths`               | integer | The cumulative number of deaths amoung patients at that time.                                                                                                                   |
 | `staff_deaths_note`             | string  | In cases where the `staff_deaths` are obscured, this explains the range of possible values.                                                                                          |
 | `patients_deaths_note`          | string  | In cases where the `patients_deaths` are obscured, this explains the range of possible values.                                                                                       |
+
+### [cdph-nursing-home-county-totals.csv](./cdph-nursing-home-county-totals.csv)
+
+The total number of cases and deaths in skilled-nursing facilities, residential care facilities for the elderly and adult residential facilities aggregated by county.
+
+These numbers are calculated by The Times using the facilities lists above. The state chooses not to provide precise numbers at facilities with fewer than 10 cases. When totaling by county, The Times substitutes the minimum value of one. The result is that the tallies are likely an undercount and should be considered the minimum possible value.
+
+| field                                   | type    | description                                                                                                                                                                          |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`                                  | date    | The date when the data were retrieved in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                                                  |
+| `county`                                | string  | The name of the county where the city is located.                                                                                                                                    |
+| `fips`                                  | string  | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources. |
+| `minimum_staff_confirmed_cases`         | integer | The minimum number of cumulative confirmed coronavirus case amoung staff at that time.                                                                                               |
+| `minimum_patients_confirmed_cases`      | integer | The minimum number of cumulative confirmed coronavirus case amoung patients at that time.                                                                                            |
+| `minimum_staff_deaths`                  | integer | The minimum number of cumulative deaths amoung staff at that time.                                                                                                                   |
+| `minimum_patients_deaths`               | integer | The minimum number of cumulative deaths amoung patients at that time.                                                                                                                |
 
 ### [cdph-hospital-patient-county-totals.csv](./cdph-hospital-patient-county-totals.csv)
 
@@ -258,6 +338,86 @@ California's Department of Public Health is releasing [county-level hospitalizat
 | `suspected_patients`     | integer | The current number suspected coronavirus cases in hospitals on this `date`.                                                                                                          |
 | `icu_positive_patients`  | integer | The current number confirmed coronavirus cases in intensive-care units on this `date`.                                                                                               |
 | `icu_suspected_patients` | integer | The current number suspected coronavirus cases in intensive-care units on this `date`.                                                                                               |
+| `icu_available_beds`     | integer | The current number open and avilable intensive-care beds on this `date`.                                                                                                             |
+
+### [cdph-reopening-tiers.csv](./cdph-reopening-tiers.csv)
+
+In August 2020, the state introduced a new framework for deciding when and how counties can reopen. Under the regime, each county is assigned to one of four tiers based on a set of metrics developed by state officials.
+
+This file records the current tier of each county by day. The definition for each group can be found on the [state's website](https://web.archive.org/web/20200829140027/https://covid19.ca.gov/safer-economy/).
+
+| field    | type    | description                                                                                                                                                                          |
+| -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`   | date    | The date when the data were collected in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                                                  |
+| `county` | string  | The name of the county.                                                                                                                                                              |
+| `fips`   | string  | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources. |
+| `tier`   | integer | The tier the county was classified in on this `date`. There are four possible values on an ordinal scale with one being the most restrictive and four the least restrictive.         |
+
+### [cdph-reopening-metrics.csv](./cdph-reopening-metrics.csv)
+
+In August 2020, the state introduced a new framework for deciding when and how counties can reopen. Under the regime, each county is assigned to one of four tiers based on a set of metrics developed by state officials.
+
+This file records the metrics released for each county by day. Definition of the benchmarks can be found on the [state's website](https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/COVID-19/COVID19CountyMonitoringOverview.aspx).
+
+| field                 | type    | description                                                                                                                                                                          |
+| --------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`                | date    | The date when the data were collected in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                                                  |
+| `county`              | string  | The name of the county.                                                                                                                                                              |
+| `fips`                | string  | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources. |
+| `percapita_case_rate` | float   | The number of new cases in a recent seven-day period — excluding cases at prisons and jails — adjusted for population and multiplied by 100,000.                                     |
+| `adjusted_case_rate`  | float   | The `percapita_case_rate` adjusted to account for the volume of testing in the area. Not done for all counties.                                                                      |
+| `positivity_rate`     | float   | The percentage of tests for the virus that come back positive in a recent seven-day period.                                                                                          |
+| `equity_metric`       | float   | An index measuring disparities in disadvantaged neighborhoods compared to the county overall. Many small counties are exempted. Added Oct. 6, 2020                                   |
+
+### [cdph-regional-stay-home-metrics.csv](./cdph-regional-stay-home-metrics.csv)
+
+In December 2020, the state [introduced a new system](https://covid19.ca.gov/stay-home-except-for-essential-needs/) for issuing stay home orders. The state's 58 counties were grouped into six regions and judged based on the percentage of available ICU beds. When the percentage available beds dropped below 15%, a stay home order restricting businesses and movement would be issued. 
+
+This file records the metrics released for each region by day.
+
+| field                  | type    | description                                                                                                                                     |
+| ---------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `date`                 | date    | The date when the data were collected in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                             |
+| `region`               | string  | The name of the region.                                                                                                                         |
+| `icu_capacity_percent` | float   | The percentage of ICU beds in the region that were available on that `date`                                                                     |
+| `stay_home_order`      | string  | An indicator of whether or not a stay home order was in effect for the region on that `date`. The range of values is `pending`, `yes` and `no`. |
+
+
+### [cdcr-state-totals.csv](./cdcr-state-totals.csv)
+
+The total number of cases amoung inmates at prisons run by the California Department of Corrections and Rehabiliation.
+
+| field                 | type    | description                                                                                         |
+| --------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `date`                | date    | The date when the data were collected in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format. |
+| `confirmed_cases`     | integer | The cumulative number of confirmed coronavirus case at that time.                                   |
+| `new_confirmed_cases` | integer | The net change in confirmed cases over the previous `date`.                                         |
+| `active_cases`        | integer | The number of active coronavirus case at that time.                                                 |
+
+### [cdcr-prison-totals.csv](./cdcr-prison-totals.csv)
+
+The cases, resolutions and deaths among inmates at the individual prison facilities operated by the California Department of Corrections and Rehabilitation.
+
+The data is currently limited to July 22, 2020, forward.
+
+| field                 | type    | description                                                                                                                                                                          |
+| --------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`                | date    | The date when the data were collected in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.                                                                                  |
+| `code`                | string  | The unique identifier of the prison institution.                                                                                                                                     |
+| `name`                | string  | The name of the prison institution.                                                                                                                                                  |
+| `city`                | string  | The city where the prison institution is located.                                                                                                                                    |
+| `county`              | string  | The county where the prison institution is located.                                                                                                                                  |
+| `fips`                | string  | The [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) given to the county by the federal government. Can be used to merge with other data sources. |
+| `zipcode`             | string  | The [ZIP Code](https://en.wikipedia.org/wiki/ZIP_Code) where the agency is located.                                                                  |
+| `x`                   | float   | The longitude of the area's centroid.                                                                                                                                                |
+| `y`                   | float   | The latitude of the area's centroid.                                                                                                                                                 |
+| `confirmed_cases`     | integer | The cumulative number of confirmed coronavirus case at that time.                                                                                                                    |
+| `new_confirmed_cases` | integer | The net change in confirmed cases over the previous `date`.                                                                                                                          |
+| `active_cases`        | integer | The number of active coronavirus case at that time.                                                                                                                                  |
+| `released_cases`      | integer | The cumulative number of coronavirus cases released from the prison at that time.                                                                                                        |
+| `resolved_cases`      | integer | The cumulative of coronavirus case where the patient ultimately recovered or had their cases otherwise resolved at that time.                                                            |
+| `deaths`              | integer | The cumulative number of deaths at that time.                                                                                                                                        |
+| `new_deaths`          | integer | The net change in deaths over the previous `date`.                                                                                                                                   |
 
 ### [latimes-project-roomkey-totals.csv](./latimes-project-roomkey-totals.csv)
 
@@ -294,6 +454,19 @@ The subcounty-level restrictions on beach access, compiled by the Los Angeles Ti
 | `area`        | string  | The name of the sub-county area being tracked.                                                                                                                                         |
 | `state_park`  | boolean | An indicator if this area is a state park.                                                                                                                                             |
 | `restriction` | string  | A description of the current level of restriction in this area.                                                                                                                        |
+
+### [los-angeles-countywide-statistical-areas.json](./los-angeles-countywide-statistical-areas.json)
+
+A GeoJSON file mapping out statistical tabulation areas created by the Los Angeles County Department of Public Health. Place-level data released by Los Angeles County correspond to these areas. Acquired via a California Public Records Act request.
+
+| field        | type    | description                                                           |
+| ------------ | ------- | --------------------------------------------------------------------- |
+| `type`       | string  | The type of area being mapped. Options are `City` and`Unincorporated` |
+| `city`       | string  | The name of the area's municipal parent, if it has one.               |
+| `community`  | string  | The name of the area.                                                 |
+| `label`      | boolean | A combination of the area's name and city. Creates a unique string.   |
+| `centroid_x` | float   | The longitude of the area's centroid.                                 |
+| `centroid_y` | float   | The latitude of the area's centroid.                                  |
 
 ## Getting started
 
