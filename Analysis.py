@@ -18,7 +18,7 @@ state_totals= "latimes-state-totals.csv"
 
 # import data
 df = pd.read_csv(state_totals, header = 0)
-df = df.dropna()
+df = df.dropna().loc[::-1].reset_index(drop = True)
 df['date'] = pd.to_datetime(df['date'])
 
 def growth_funct(x,a,b,c):
@@ -32,9 +32,9 @@ growth_fit = curve_fit(growth_funct,x,y)
 death_fit = curve_fit(growth_funct,x,y_1)
 print (growth_fit)
 
-a = 8.925
-b = 80.3
-c = 56598.7
+a = 4.94990393e+01
+b = 2.29251485e+02
+c = 1.44195426e+06
 
 a_death = 12.3
 b_death = 91.6
@@ -57,4 +57,4 @@ plt.grid(True)
 plt.legend(loc="upper left")
 plt.show()
 
-print(growth_funct(250,a,b,c))
+print(growth_funct(360,a,b,c))
